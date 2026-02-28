@@ -75,18 +75,7 @@ function Home() {
   const ended = filtered.filter(
     (i) => i.state === "end" || now > new Date(i.endTime).getTime(),
   );
-  // 3. Thêm nguyên đoạn if này vào trước cái return chính
-  if (isLoading) {
-    return (
-      <MainLayout>
-        <div className="text-center mt-20 text-xl font-bold animate-pulse text-gray-500">
-          ⏳ Đang tải dữ liệu...
-        </div>
-      </MainLayout>
-    );
-  }
 
-  // 3. Thêm nguyên đoạn if này vào trước cái return chính
   if (isLoading) {
     return (
       <MainLayout>
