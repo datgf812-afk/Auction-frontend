@@ -105,7 +105,7 @@ function Home() {
             {sec.title}
           </div>
           <div className="relative mt-4">
-            {sec.items.length > 3 && (
+            {sec.items.length > 1 && (
               <>
                 {showArrow[sec.key].L && (
                   <button
