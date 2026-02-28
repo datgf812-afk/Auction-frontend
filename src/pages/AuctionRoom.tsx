@@ -33,38 +33,60 @@ const AuctionRoom: React.FC = () => {
   const handleAuction = async (add: number) => {
     if (!myName || isNaN(add) || add < 50000) return;
     if (cash < currentPrice + add) return alert("Số dư không đủ!");
-    const res = await fetch(`${API_URL}/api/bids`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        auctionItemId: Number(id),
-        amount: currentPrice + add,
-        bidderName: myName,
-      }),
-    });
-    if (res.ok) syncCash();
+    try {
+      const res = await fetch(`${API_URL}/api/bids`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auctionItemId: Number(id),
+          amount: currentPrice + add,
+          bidderName: myName,
+        }),
+      });
+      if (res.ok) syncCash();
+    } catch (e) {
+      console.error("Lỗi kết nối hoặc server:", e);
+    }
   };
 
   useEffect(() => {
+    if (!id || id === "undefined" || id === "null") return;
+
     const init = async () => {
-      const [resItem, resBid] = await Promise.all([
-        fetch(`${API_URL}/api/auctions/${id}`),
-        fetch(`${API_URL}/api/bids/${id}`),
-      ]);
-      if (resItem.ok) {
-        const d = await resItem.json();
-        setItem(d);
-        setCurrentPrice(d.currentPrice);
-        setTimeLeft(calc(d.startTime, d.endTime, d.state));
-        setHistoryPrice(
-          (resBid.ok ? await resBid.json() : []).map((b: any) => ({
-            ...b,
-            timestamp: new Date(b.timestamp),
-          })),
-        );
+      setLoading(true);
+      try {
+        const [resItem, resBid] = await Promise.all([
+          fetch(`${API_URL}/api/auctions/${id}`),
+          fetch(`${API_URL}/api/bids/${id}`),
+        ]);
+
+        if (resItem.ok) {
+          const d = await resItem.json();
+          setItem(d);
+          setCurrentPrice(d.currentPrice);
+          setTimeLeft(calc(d.startTime, d.endTime, d.state));
+
+          if (resBid.ok) {
+            const bidData = await resBid.json();
+            setHistoryPrice(
+              bidData.map((b: any) => ({
+                ...b,
+                timestamp: new Date(b.timestamp),
+              })),
+            );
+          } else {
+            setHistoryPrice([]);
+          }
+        } else {
+          console.error("Lỗi tải thông tin vật phẩm:", resItem.status);
+        }
+      } catch (error) {
+        console.error("Lỗi kết nối mạng hoặc server:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
+
     init();
   }, [id]);
 
@@ -108,13 +130,13 @@ const AuctionRoom: React.FC = () => {
         </Link>
       </div>
       <div className="flex justify-around mb-4 flex-wrap gap-2 md:text-base items-start">
-        <div className="flex flex-col md:w-[48%] md:h-[430px] bg-gray-100 p-2 bg-white items-center gap-1 shadow w-full order-last md:order-none">
+        <div className="flex flex-col rounded md:w-[48%] md:h-[430px] bg-gray-100 p-2 bg-white items-center gap-1 shadow w-full order-last md:order-none">
           <img
             src={item.imageUrl}
-            className="border border-black object-cover w-full"
+            className="border border-black object-cover w-[400px] h-[370px]"
             alt=""
           />
-          <p className="text-xl md:text-2xl font-bold">{item.name}</p>
+          <p className="text-xl md:text-2xl font-bold mt-1">{item.name}</p>
         </div>
         <div className="flex flex-col bg-gray-100 p-3 bg-white w-full md:w-[48%] md:h-[430px] shadow">
           <p className="text-center mb-1">
@@ -201,7 +223,9 @@ const AuctionRoom: React.FC = () => {
           )}
         </div>
       </div>
-      <p className="">{item.description}</p>
+      <p className="text-justify leading-relaxed break-words">
+        {item.description}
+      </p>
     </MainLayout>
   );
 };

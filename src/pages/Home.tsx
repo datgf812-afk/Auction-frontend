@@ -17,12 +17,18 @@ function Home() {
     up: { L: false, R: true },
     end: { L: false, R: true },
   });
+
   const API_URL = import.meta.env.VITE_API_URL;
+
   const fetchItems = async () => {
     try {
       const res = await fetch(`${API_URL}/api/auctions`);
-      if (res.ok) setDataItem(await res.json());
-    } catch (e) {}
+      if (res.ok) {
+        setDataItem(await res.json());
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   useEffect(() => {
@@ -144,4 +150,5 @@ function Home() {
     </MainLayout>
   );
 }
+
 export default Home;
