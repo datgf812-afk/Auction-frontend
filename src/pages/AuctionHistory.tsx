@@ -41,7 +41,7 @@ const AuctionHistory = () => {
       </div>
       <div className="p-4 max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold mb-4">Lịch sử đấu giá thành công</h2>
-        {history.length === 0 ? (
+        {history?.length === 0 ? (
           <p>Bạn chưa thắng phiên đấu giá nào.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 items-start gap-6">
