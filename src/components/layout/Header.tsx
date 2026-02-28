@@ -36,7 +36,7 @@ const Header: React.FC = () => {
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      navigate(`/search?keyword=${searchKeyword}`);
+      navigate(`/?search=${searchKeyword}`);
     }
   };
 

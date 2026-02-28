@@ -29,10 +29,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.getItem("realName") || localStorage.getItem("userName");
 
       if (!user) {
-        localStorage.setItem(
-          "userName",
-          `User_${Math.floor(Math.random() * 10000)}`,
-        );
+        const guestName = `User_${Math.floor(Math.random() * 10000)}`;
+        localStorage.setItem("userName", guestName);
+        localStorage.setItem("realName", guestName);
+
+        fetch(`${API_URL}/api/auth/users/${guestName}`)
+          .then(() => {
+            return fetch(`${API_URL}/api/auth/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userName: guestName,
+                password: "demo123",
+              }),
+            });
+          })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.token) {
+              localStorage.setItem("token", data.token);
+            }
+          })
+          .catch((err) => console.error(err));
         return;
       }
 

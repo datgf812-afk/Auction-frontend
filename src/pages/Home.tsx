@@ -7,7 +7,7 @@ function Home() {
   const [now, setNow] = useState(Date.now());
   const [dataItem, setDataItem] = useState<any[]>([]);
   const keyword = new URLSearchParams(useLocation().search).get("search") || "";
-
+  const [isLoading, setIsLoading] = useState(true);
   const activeRef = useRef<HTMLDivElement>(null);
   const upRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -28,6 +28,8 @@ function Home() {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,7 +75,28 @@ function Home() {
   const ended = filtered.filter(
     (i) => i.state === "end" || now > new Date(i.endTime).getTime(),
   );
+  // 3. Thêm nguyên đoạn if này vào trước cái return chính
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="text-center mt-20 text-xl font-bold animate-pulse text-gray-500">
+          ⏳ Đang tải dữ liệu...
+        </div>
+      </MainLayout>
+    );
+  }
 
+  // 3. Thêm nguyên đoạn if này vào trước cái return chính
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="text-center mt-20 text-xl font-bold text-gray-500">
+          Đang tải dữ liệu... (nếu lần đầu vào trang, có thể mất đến 30 giây để
+          khởi động server)
+        </div>
+      </MainLayout>
+    );
+  }
   return (
     <MainLayout>
       <style>{`.no-scrollbar::-webkit-scrollbar { display: none; }`}</style>

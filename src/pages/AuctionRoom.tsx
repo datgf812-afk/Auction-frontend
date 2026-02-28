@@ -34,9 +34,13 @@ const AuctionRoom: React.FC = () => {
     if (!myName || isNaN(add) || add < 50000) return;
     if (cash < currentPrice + add) return alert("Số dư không đủ!");
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/bids`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           auctionItemId: Number(id),
           amount: currentPrice + add,
@@ -45,7 +49,7 @@ const AuctionRoom: React.FC = () => {
       });
       if (res.ok) syncCash();
     } catch (e) {
-      console.error("Lỗi kết nối hoặc server:", e);
+      console.error(e);
     }
   };
 
