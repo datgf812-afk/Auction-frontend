@@ -34,17 +34,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("realName", guestName);
 
         fetch(`${API_URL}/api/auth/users/${guestName}`)
-          .then(() => {
-            return fetch(`${API_URL}/api/auth/login`, {
+          .then(() =>
+            fetch(`${API_URL}/api/auth/login`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 userName: guestName,
                 password: "demo123",
               }),
-            });
+            }),
+          )
+          .then(async (res) => {
+            if (!res.ok) throw new Error(await res.text());
+            return res.json();
           })
-          .then((res) => res.json())
           .then((data) => {
             if (data.token) {
               localStorage.setItem("token", data.token);
